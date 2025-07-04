@@ -1,0 +1,131 @@
+import React from 'react';
+import { Audiencia } from '../../types/audiencia';
+import { Responsable } from '../../types/responsable';
+import Modal from '../ui/Modal';
+
+interface AudienciaDetailModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  audiencia: Audiencia | null;
+  responsable?: Responsable;
+}
+
+const AudienciaDetailModal: React.FC<AudienciaDetailModalProps> = ({
+  isOpen,
+  onClose,
+  audiencia,
+  responsable,
+}) => {
+  if (!audiencia) return null;
+
+  const formatDateTime = (dateString: string) => {
+    return new Date(dateString).toLocaleString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const getEstadoColor = (estado: string) => {
+    switch (estado) {
+      case 'Pendiente':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'En Proceso':
+        return 'bg-blue-100 text-blue-800';
+      case 'Finalizado':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getPriorityColor = (prioridad?: string) => {
+    switch (prioridad) {
+      case 'Alta':
+        return 'bg-red-100 text-red-800';
+      case 'Media':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'Baja':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title="Detalle de la Audiencia">
+      <div className="space-y-6">
+        <div>
+          <h4 className="text-sm font-medium text-gray-200 mb-2">Descripción</h4>
+          <div className="text-white bg-dark-700 rounded-md p-3 whitespace-pre-wrap">
+            {audiencia.descripcion}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h4 className="text-sm font-medium text-gray-200 mb-2">Estado</h4>
+            <div className="bg-dark-700 rounded-md p-3">
+              <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getEstadoColor(audiencia.estado)}`}>
+                {audiencia.estado}
+              </span>
+            </div>
+          </div>
+          <div>
+            <h4 className="text-sm font-medium text-gray-200 mb-2">Prioridad</h4>
+            <div className="bg-dark-700 rounded-md p-3">
+              {audiencia.prioridad ? (
+                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getPriorityColor(audiencia.prioridad)}`}>
+                  {audiencia.prioridad}
+                </span>
+              ) : (
+                <span className="text-gray-400">No definida</span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 className="text-sm font-medium text-gray-200 mb-2">Responsable</h4>
+          <p className="text-white bg-dark-700 rounded-md p-3">
+            {responsable ? `${responsable.nombre} ${responsable.apellido}` : 'No asignado'}
+          </p>
+        </div>
+
+        {audiencia.link && (
+          <div>
+            <h4 className="text-sm font-medium text-gray-200 mb-2">Enlace</h4>
+            <div className="bg-dark-700 rounded-md p-3">
+              <a 
+                href={audiencia.link} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-secondary-400 hover:text-secondary-300 break-all"
+              >
+                {audiencia.link}
+              </a>
+            </div>
+          </div>
+        )}
+
+        <div>
+          <h4 className="text-sm font-medium text-gray-200 mb-2">Fecha y Hora de la Audiencia</h4>
+          <p className="text-white bg-dark-700 rounded-md p-3">
+            {formatDateTime(audiencia.fecha_hora)}
+          </p>
+        </div>
+
+        <div>
+          <h4 className="text-sm font-medium text-gray-200 mb-2">Fecha de Creación</h4>
+          <p className="text-white bg-dark-700 rounded-md p-3">
+            {formatDateTime(audiencia.fecha_creacion)}
+          </p>
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
+export default AudienciaDetailModal;
